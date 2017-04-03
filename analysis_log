@@ -1,0 +1,111 @@
+03/28/17
+it can be seen that there are around 5 tiles with pretty bad average quality;
+so using trimmomatic could improve the read quality a lot!!
+
+trimmomatic commands: [default]
+java -jar trimmomatic-0.35.jar SE -phred33 input.fq.gz output.fq.gz ILLUMINACLIP:TruSeq3_SE:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36 -trimlog <logFile>
+
+java -jar $trimmo SE -phred33 SV1_A_1_R1.fastq SV1_A_1_R1_trimmed.fastq ILLUMINACLIP:$TruSeq3_SE:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+ -trimlog SV1_A_1_R1_trim_log
+
+ TruSeq3-SE="/hpf/tools/centos6/trimmomatic/source/Trimmomatic-0.32/adapters/TruSeq3-SE.fa"
+
+
+03/29/17
+run trimmomatic for all the files
+for i in *fastq
+do
+prefix=${i%.*}
+java -jar $trimmo SE -phred33 $i ${prefix}_trimmed.fastq ILLUMINACLIP:$TruSeq3_SE:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+done
+
+# to rename the accidental dot-separated name
+for i in *trimmed.fastq
+do
+prefix=${i%%.*}
+mv $i ${prefix}_trimmed.fastq
+done
+
+STAR commands:
+#using ENCODE standard parameters
+example:
+STAR --runThreadN 8 --genomeDir /home/liangxi/mdwilson/genomes/hsap/star_index_2.5.1b/ --readFilesIn  SV20_D_3_R1_trimmed.fastq --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix ./star_output/SV20_D_3_R1_trimmed_ 
+
+# create multiple jobs to submit in HPF:
+for i in *trimmed.fastq
+do
+prefix=${i%.*}
+echo "STAR --runThreadN 8 --genomeDir /home/liangxi/mdwilson/genomes/hsap/star_index_2.5.1b/ --readFilesIn  $i --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix ./star_output/${prefix}_" >> star_jobs
+done
+
+seems 16g is not enough to run STAR; must apply for more memory!!!
+
+two jobs got killed..... not sure why.... re-run the two
+SV16_C_4_R1_trimmed
+SV22_D_5_R1_trimmed
+
+STAR --runThreadN 8 --genomeDir /home/liangxi/mdwilson/genomes/hsap/star_index_2.5.1b/ --readFilesIn SV22_D_5_R1_trimmed.fastq --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix ./star_output/SV22_D_5_R1_trimmed_ & 
+
+STAR --runThreadN 8 --genomeDir /home/liangxi/mdwilson/genomes/hsap/star_index_2.5.1b/ --readFilesIn SV16_C_4_R1_trimmed.fastq --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix ./star_output/SV16_C_4_R1_trimmed_ & 
+
+I forgot to output wiggle file(normalized).... lkjfdsl;k
+try to find the other tool to get the wiggle file
+
+for i in *trimmed.fastq
+do
+prefix=${i%.*}
+echo "STAR --runThreadN 8 --genomeDir /home/liangxi/mdwilson/genomes/hsap/star_index_2.5.1b/ --readFilesIn  $i --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix ./star_output/${prefix}_ --outWigType wiggle " >> star_jobs
+done
+
+#to count the two stranded gene counts:
+cat SV16_C_4_R1_trimmed_ReadsPerGene.out.tab| awk ' BEGIN{sum1=0;sum2=0} NR>4 {sum1 += $3; sum2 += $4}END{print sum1, sum2}' 
+
+column 3 has 10 times more counts than column 4 # which means it's forward stranded
+
+for i in *Reads*
+do
+cat $i |awk 'BEGIN{OFS="\t"} NR>4 {print $1,$3}' > "${i%%.*}_countable"
+done
+
+create countables for ensembl ID and column 3 gene counts
+
+convert bam to bigwig files: firstly index them
+for i in *bam
+do
+samtools index $i "${i}.bai"
+bamCoverage -b $i  -o "${i%.*}.bw"  --normalizeUsingRPKM
+done
+
+03/30/17
+#usign qualimap to do RNA-seq reads mapping quality control
+
+trying to install qualimap; however, installation failed because dependency Ringo and Repitools [used for clustering] cannot be installed..... try execute qualimap without these two pacakdges... 
+
+qualimap can perform several main types of analysis: BAM QC ; RNA-seq QC; Counts QC; clustering;
+BAM QC (or multi-BAM QC (add PCA as well)) is good for chip-seq or any non- RNA-seq data; RNA-seq QC/ Counts QC(global and individually ones) are good for RNA-seq; clustering is especially for epigenomics features (histone marker based Chip-seq or ATAC-seq)
+
+1. qualimap rnaseq:
+commands: 
+qualimap rnaseq -bam SV10_B_4_R1_trimmed_Aligned.sortedByCoord.out.bam -gtf /home/mdwilson/hpf_trial/genomes/hsap/gtf/gencode.v19.annotation.gtf -p strand-specific-forward --java-mem-size=8G &
+
+for i in *bam
+do
+qualimap rnaseq -bam $i -gtf /home/mdwilson/hpf_trial/genomes/hsap/gtf/gencode.v19.annotation.gtf -p strand-specific-forward --java-mem-size=10G
+done
+
+2. counts QC (mainly globally qc)
+#input files are the counttable// can try to use the ones output by STAR
+qualimap counts -d counts_qc_text.tsv -s human &
+
+3. using edgeR to do DE:
+
+
+
+
+
+
+
+
+
+
+
