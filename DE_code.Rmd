@@ -1,0 +1,239 @@
+---
+title: "3utr_DE"
+author: "DW"
+date: "April 3, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##pre-processing of the datasets
+
+the clustering (scaled-euclidean distance) shows that:
+1. SV5 is an outlier, may consider removing it; 
+2. each group can cluster together meaning the library are generally nice
+3. 14weekdb,14weekwt and 24week wt are one group; the other group is PBS and 24weekdb
+
+point3 explains why 24weekdbvsPBS have fewer significant genes and why 14weekdbvswt doesn't work
+
+additionally, the p_value distribution of 14weekdbvswt is an increased slope, could this be artifacts???
+
+test if 3utr works????
+
+```{r}
+library(edgeR)
+library(corrplot)
+# read the countable and re-ordering it into a dataframe (data from STAR)
+path='/home/mdwilson/hpf_trial/liangxi/fastq/3utr_huvec/star_output/3utr_countable'
+utr_count<- read.table(path,sep="\t")
+coloumn_names=c("Ensembl_ID","SV10","SV11","SV13","SV14","SV15","SV16","SV17","SV18","SV19","SV1","SV20","SV21","SV22","SV23","SV2","SV3","SV4","SV5","SV6","SV7","SV8","SV9")
+colnames(utr_count) <- coloumn_names
+utr_count$SV20 <- NULL  #since SV20 is not working for sequencing 
+utr_count<- utr_count[,c(1,11,seq(15,22),seq(2,10),seq(12,14))]
+
+#create the design matrix
+design_colname <- factor(paste(rep("Sample",21),seq(21),sep=""))
+treat <- factor(c(rep("PBS",6),rep("exosomes",15)),levels=c("PBS","exosomes"))
+age <- factor(c(rep("NA",6),rep("14week",5),rep("24week",10)),levels=c("NA","14week","24week"))
+genotype <- factor(c(rep("NA",6),rep("wt",3),rep("db",2),rep("wt",5),rep("db",5)),levels=c("NA","wt","db"))
+group <- factor(paste(treat,age,genotype,sep=""),levels=c("PBSNANA","exosomes14weekwt","exosomes14weekdb","exosomes24weekwt","exosomes24weekdb"))
+design_matrix <- data.frame(treat,age,genotype,group,row.names = design_colname)
+
+
+#create a deglist object
+y <- DGEList(counts=utr_count[,2:22],genes=utr_count[,1],group=group)
+
+#filtering
+o <- order(rowSums(y$counts),decreasing = T)
+y <- y[o,]
+sum(rowSums(y$counts)!=0) #25366 genes that have at least one read in a libarary
+idx1 <- rowSums(cpm(y)>1)>2  #the filtering parameters recommended in 2013 nature portocol; 14439 genes remained
+y <- y[idx1,]
+y$samples$lib.size <- colSums(y$counts)
+y <- calcNormFactors(y)
+y$samples
+
+#create a design object; adding the coloumn names compared to the version without adding data parameters
+design <- model.matrix(~group,data=y$samples)
+
+#estimate the GLM dispersions
+y <- estimateDisp(y,design)
+
+plotBCV(y,cex=0.4) 
+# edger default pca (top genes, euclidean distances)
+plotMDS(y,cex=0.5)
+
+#corrlation matrix 
+M <- cor(data.frame(cpm(y)))
+corrplot.mixed(M,order="hclust")
+
+# home-made PCA; log transform first on library-normalized datasets(many 0s; so try with log(x+1))
+y1 <- data.frame(cpm(y))
+y1 <- log(y1+1)
+y1 <- as.data.frame(t(y1))
+y.pca <- prcomp(y1,
+                center=T,
+                scale.=T)
+
+print(y.pca)
+summary(y.pca)
+plot(y.pca, type="l") # the first two pca cannot interpret the whole data (22% and 12%)
+
+y2<- cbind(y1,treatment=paste(treat,age,genotype,sep="")) #with group labels
+library("ggfortify")
+autoplot(y.pca,label=T,data=y2,colour="treatment")
+
+# clustring and heatmap
+# the clustering shows that SV5 is an outlier!!! may consider removing it;
+heatmap(as.matrix(scale(t(y1))),scale="none")
+
+```
+
+
+##GLM models for DE analysis
+the comparisons: [threshold: FDR<0.05, abs(logFC)>1]
+1. basal(PBS) + other four conditions (4 comparisons)
+2. the effects of db on gene experssion (2 comparisons)
+
+
+```{r}
+library(ggplot2)
+library(RColorBrewer)
+fit<- glmQLFit(y,design)
+qlf.14weekwtvsPBS <- glmQLFTest(fit,coef=2)
+genes_14weekwtvsPBS<- topTags(qlf.14weekwtvsPBS,n=length(qlf.14weekwtvsPBS))$table
+# look at p_value distribution
+ggplot(genes_14weekwtvsPBS,aes(x=PValue))+
+  geom_histogram(bins=100)+
+  geom_vline(xintercept = 0.1, linetype="dashed")
+  labs(title="14weekwtvsPBS")
+# how many genes are  called significant? increased and decreased?
+nrow(genes_14weekwtvsPBS[genes_14weekwtvsPBS$FDR< 0.05,])
+nrow(genes_14weekwtvsPBS[genes_14weekwtvsPBS$FDR< 0.05 & genes_14weekwtvsPBS$logFC>1,])
+upgene <- genes_14weekwtvsPBS[genes_14weekwtvsPBS$FDR< 0.05 & genes_14weekwtvsPBS$logFC>1,]
+nrow(genes_14weekwtvsPBS[genes_14weekwtvsPBS$FDR< 0.05 & genes_14weekwtvsPBS$logFC< -1,])
+downgene <- genes_14weekwtvsPBS[genes_14weekwtvsPBS$FDR< 0.05 & genes_14weekwtvsPBS$logFC< -1,]
+
+#plot MA plot
+color <- brewer.pal(n=2,name="Set1")
+
+ggplot(genes_14weekwtvsPBS,aes(x=logCPM,y=logFC))+
+  geom_point(alpha=0.3)+
+  geom_point(data=upgene, aes(x=logCPM,y=logFC,color=color[2]),alpha=0.5)+
+  geom_point(data=downgene, aes(x=logCPM,y=logFC,color=color[1]),alpha=0.5)+
+  labs(color="",title="14weekwtvsPBS")+
+  scale_color_manual(labels=c("increased","decreased"),values=c(color[1],color[2]))+
+  geom_hline(yintercept = c(1,-1),color="magenta",linetype="dashed")
+  
+#volcano plot
+ggplot(genes_14weekwtvsPBS,aes(x=logFC,y=-log10(PValue)))+
+  geom_point(alpha=0.3)+
+  geom_point(data=upgene, aes(x=logFC,y=-log10(PValue),color=color[2]),alpha=0.5)+
+  geom_point(data=downgene, aes(x=logFC,y=-log10(PValue),color=color[1]),alpha=0.5)+
+  labs(color="",title="14weekwtvsPBS")+
+  scale_color_manual(labels=c("increased","decreased"),values=c(color[1],color[2]))+
+  geom_vline(xintercept = c(1,-1),color="magenta",linetype="dashed")
+
+
+
+# qlf.14weekdbvsPBS
+# qlf.24weekwtvsPBS
+# qlf.24weekdbvsPBS
+
+```
+
+
+```{r}
+# write a function
+DE.analyze<- function(y, design, comparison.name){
+  # input: a DGEList object that has been counted for dispersion and TMM normalized; design is a design matrix generated by model.matrix; comparison.name is a string, such as: 14weekwtvsPBS || weird bug: can not take 24weekdbvswt or 14weekdbvswt
+  library(ggplot2)
+  library(RColorBrewer)
+  comparison.list <- list("14weekwtvsPBS"=2,"14weekdbvsPBS"=3,"24weekwtvsPBS"=4,"24weekdbvsPBS"=5,"24weekdbvswt"=c(0,0,0,-1,1))
+  fit<- glmQLFit(y,design)
+  if (length(comparison.list[[comparison.name]])<2){
+  qlf <- glmQLFTest(fit,coef =comparison.list[[comparison.name]])} else
+    qlf <- glmQLFTest(fit,contrast =comparison.list[[comparison.name]])
+  all_genes<- topTags(qlf,n=length(qlf))$table
+  # look at p_value distribution
+  fig1<- ggplot(all_genes,aes(x=PValue))+
+    geom_histogram(bins=100)+
+    geom_vline(xintercept = 0.1, linetype="dashed")
+    labs(title=comparison.name)
+  # how many genes are  called significant? increased and decreased?
+  nrow(all_genes[all_genes$FDR< 0.05,])
+  nrow(all_genes[all_genes$FDR< 0.05 & all_genes$logFC>1,])
+  upgene <- all_genes[all_genes$FDR< 0.05 & all_genes$logFC>1,]
+  nrow(all_genes[all_genes$FDR< 0.05 & all_genes$logFC< -1,])
+  downgene <- all_genes[all_genes$FDR< 0.05 & all_genes$logFC< -1,]
+  
+  #plot MA plot
+  color <- brewer.pal(n=3,name="Set1")
+  
+  fig2<- ggplot(all_genes,aes(x=logCPM,y=logFC))+
+    geom_point(alpha=0.3)+
+    geom_point(data=upgene, aes(x=logCPM,y=logFC,color=color[2]),alpha=0.5)+
+    geom_point(data=downgene, aes(x=logCPM,y=logFC,color=color[1]),alpha=0.5)+
+    labs(color="",title=comparison.name)+
+    scale_color_manual(labels=c("increased","decreased"),values=c(color[1],color[2]))+
+    geom_hline(yintercept = c(1,-1),color="magenta",linetype="dashed")
+  #volcano plot
+  fig3 <- ggplot(all_genes,aes(x=logFC,y=-log10(PValue)))+
+    geom_point(alpha=0.3)+
+    geom_point(data=upgene, aes(x=logFC,y=-log10(PValue),color=color[2]),alpha=0.5)+
+    geom_point(data=downgene, aes(x=logFC,y=-log10(PValue),color=color[1]),alpha=0.5)+
+    labs(color="",title=comparison.name)+
+    scale_color_manual(labels=c("increased","decreased"),values=c(color[1],color[2]))+
+    geom_vline(xintercept = c(1,-1),color="magenta",linetype="dashed")
+  print(fig1)
+  print(fig2)
+  print(fig3)
+}
+
+#plot the first group of comparison figures + "24weekdbvswt" 
+comparison.outlist <- list("14weekwtvsPBS","14weekdbvsPBS","24weekwtvsPBS","24weekdbvsPBS","24weekdbvswt")
+for (i in comparison.outlist){
+DE.analyze(y,design,i)
+}
+
+## plot 14weekdbvswt
+comparison.list <- list("14weekdbvswt"=c(0,-1,1,0,0),"24weekdbvswt"=c(0,0,0,-1,1))
+fit<- glmQLFit(y,design)
+qlf <- glmQLFTest(fit,contrast =comparison.list[["14weekdbvswt"]])
+all_genes<- topTags(qlf,n=length(qlf))$table
+# look at p_value distribution
+fig1<- ggplot(all_genes,aes(x=PValue))+
+  geom_histogram(bins=100)+
+  geom_vline(xintercept = 0.1, linetype="dashed")
+  labs(title="comparison.name")
+# how many genes are  called significant? increased and decreased?
+nrow(all_genes[all_genes$FDR< 0.05,])
+nrow(all_genes[all_genes$FDR< 0.05 & all_genes$logFC>1,])
+upgene <- all_genes[all_genes$FDR< 0.05 & all_genes$logFC>1,]
+nrow(all_genes[all_genes$FDR< 0.05 & all_genes$logFC< -1,])
+downgene <- all_genes[all_genes$FDR< 0.05 & all_genes$logFC< -1,]
+#plot MA plot
+color <- brewer.pal(n=3,name="Set1")
+fig2<- ggplot(all_genes,aes(x=logCPM,y=logFC))+
+  geom_point(alpha=0.3)+
+  geom_point(data=upgene, aes(x=logCPM,y=logFC,color=color[2]),alpha=0.5)+
+  geom_point(data=downgene, aes(x=logCPM,y=logFC,color=color[1]),alpha=0.5)+
+  labs(color="",title="comparison.name")+
+  scale_color_manual(labels=c("increased","decreased"),values=c(color[1],color[2]))+
+  geom_hline(yintercept = c(1,-1),color="magenta",linetype="dashed")
+#volcano plot
+fig3 <- ggplot(all_genes,aes(x=logFC,y=-log10(PValue)))+
+  geom_point(alpha=0.3)+
+  geom_point(data=upgene, aes(x=logFC,y=-log10(PValue),color=color[2]),alpha=0.5)+
+  geom_point(data=downgene, aes(x=logFC,y=-log10(PValue),color=color[1]),alpha=0.5)+
+  labs(color="",title="comparison.name")+
+  scale_color_manual(labels=c("increased","decreased"),values=c(color[1],color[2]))+
+  geom_vline(xintercept = c(1,-1),color="magenta",linetype="dashed")
+print(fig1)
+print(fig2)
+print(fig3)
+
+```
+
