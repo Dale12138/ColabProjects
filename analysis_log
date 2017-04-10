@@ -100,6 +100,14 @@ qualimap counts -d counts_qc_text.tsv -s human &
 3. using edgeR to do DE:
 
 
+04/03/17
+1. contanecate all countables together
+create a file: 3utr_countable ## the order is as the wildcards of *countable (22 in total)
+
+paste *countable| awk '{s=""; for (i=0;i<=NF;i+=2) {s=s?s"\t"$i:$1} print s}'> 3utr_countable
+
+2. read into R and use R to get a modified dataframe
+coloumn_names=c("Ensembl_ID","SV10","SV11","SV13","SV14","SV15","SV16","SV17","SV18","SV19","SV1","SV20","SV21","SV22","SV23","SV2","SV3","SV4","SV5","SV6","SV7","SV8","SV9")
 
 
 
