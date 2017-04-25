@@ -1,0 +1,53 @@
+RNA-Seq QC report
+-----------------------------------
+
+>>>>>>> Input
+
+    bam file = SV22_D_5_R1_trimmed_Aligned.sortedByCoord.out.bam
+    gff file = /home/mdwilson/hpf_trial/genomes/hsap/gtf/gencode.v19.annotation.gtf
+    counting algorithm = uniquely-mapped-reads
+    protocol = strand-specific-forward
+
+
+>>>>>>> Reads alignment
+
+    reads aligned  = 6,525,406
+    total alignments = 8,523,908
+    secondary alignments = 1,998,502
+    non-unique alignments = 2,805,655
+    aligned to genes  = 3,590,689
+    ambiguous alignments = 62,327
+    no feature assigned = 2,065,237
+    not aligned = 0
+
+
+>>>>>>> Reads genomic origin
+
+    exonic =  3,590,689 (63.49%)
+    intronic = 1,428,857 (25.26%)
+    intergenic = 636,380 (11.25%)
+    overlapping exon = 312,563 (5.53%)
+
+
+>>>>>>> Transcript coverage profile
+
+    5' bias = 0.03
+    3' bias = 0.41
+    5'-3' bias = 0.42
+
+
+>>>>>>> Junction analysis
+
+    reads at junctions = 398,507
+
+    AGGA : 7.84%
+    AGGT : 6.88%
+    ACCT : 4.87%
+    AATA : 4.36%
+    TCCT : 2.52%
+    AGCC : 2.41%
+    AGCT : 2.34%
+    AGGG : 2.32%
+    ATCT : 2.2%
+    AACT : 1.89%
+    AGGC : 1.85%

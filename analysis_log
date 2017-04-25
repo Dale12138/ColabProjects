@@ -48,7 +48,7 @@ STAR --runThreadN 8 --genomeDir /home/liangxi/mdwilson/genomes/hsap/star_index_2
 
 STAR --runThreadN 8 --genomeDir /home/liangxi/mdwilson/genomes/hsap/star_index_2.5.1b/ --readFilesIn SV16_C_4_R1_trimmed.fastq --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix ./star_output/SV16_C_4_R1_trimmed_ & 
 
-I forgot to output wiggle file(normalized).... lkjfdsl;k
+I forgot to output wiggle file(normalized).... 
 try to find the other tool to get the wiggle file
 
 for i in *trimmed.fastq
@@ -110,10 +110,365 @@ paste *countable| awk '{s=""; for (i=0;i<=NF;i+=2) {s=s?s"\t"$i:$1} print s}'> 3
 coloumn_names=c("Ensembl_ID","SV10","SV11","SV13","SV14","SV15","SV16","SV17","SV18","SV19","SV1","SV20","SV21","SV22","SV23","SV2","SV3","SV4","SV5","SV6","SV7","SV8","SV9")
 
 
+04/13/17
+set up the trackHubs on UCSC genome browser:
+1. hub.txt:
+hub Fish_Hub
+shortLabel Fish Hub
+longLabel Fish Lab HUVEC project Genome Browser Hub
+genomesFile genomes.txt
+email lxwang1993@gmail.com
+descriptionUrl
+
+2. genomes.txt:
+genome hg19
+trackDb hg19/trackDb.txt
+
+3. hg19/trackDb.txt: [the script can be also found in ftp]
+
+track HUVEC
+superTrack on
+shortLabel HUVEC
+longLabel 3-UTR HUVEC
+
+
+track HUVEC_PBS
+shortLabel HUVEC_PBS
+longLabel HUVEC_PBS
+container multiWig
+aggregate none
+showSubtrackColorOnUi on
+type bigWig
+autoScale on
+maxHeightPixels 128:50:11
+parent HUVEC
+
+
+        track HUVEC_PBS_SV1
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV1_A_1_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_PBS_SV1
+        longLabel SV1_A_1_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_PBS
+        color 86,180,233
+        type bigWig
+
+
+        track HUVEC_PBS_SV2
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV2_A_2_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_PBS_SV2
+        longLabel SV2_A_2_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_PBS
+        color 86,180,233
+        type bigWig
+
+
+        track HUVEC_PBS_SV3
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV3_A_3_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_PBS_SV3
+        longLabel SV3_A_3_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_PBS
+        color 86,180,233
+        type bigWig
+
+
+        track HUVEC_PBS_SV4
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV4_A_4_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_PBS_SV4
+        longLabel SV4_A_4_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_PBS
+        color 86,180,233
+        type bigWig
+
+
+        track HUVEC_PBS_SV5
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV5_A_5_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_PBS_SV5
+        longLabel SV5_A_5_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_PBS
+        color 86,180,233
+        type bigWig
+
+
+        track HUVEC_PBS_SV6
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV6_A_6_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_PBS_SV6
+        longLabel SV6_A_6_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_PBS
+        color 86,180,233
+        type bigWig
+
+
+track HUVEC_14weekwt
+shortLabel HUVEC_14weekwt
+longLabel HUVEC_14weekwt
+container multiWig
+aggregate none
+showSubtrackColorOnUi on
+type bigWig
+autoScale on
+maxHeightPixels 128:50:11
+parent HUVEC
+
+        track HUVEC_14weekwt_SV7
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV7_B_1_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_14weekwt_SV7
+        longLabel SV7_B_1_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_14weekwt
+        color 86,180,233
+        type bigWig
+
+
+        track HUVEC_14weekwt_SV8
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV8_B_2_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_14weekwt_SV8
+        longLabel SV8_B_2_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_14weekwt
+        color 86,180,233
+        type bigWig
+
+
+        track HUVEC_14weekwt_SV9
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV9_B_3_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_14weekwt_SV9
+        longLabel SV9_B_3_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_14weekwt
+        color 86,180,233
+        type bigWig
+
+
+track HUVEC_14weekdb
+shortLabel HUVEC_14weekdb
+longLabel HUVEC_14weekdb
+container multiWig
+aggregate none
+showSubtrackColorOnUi on
+type bigWig
+autoScale on
+maxHeightPixels 128:50:11
+parent HUVEC
+
+        track HUVEC_14weekdb_SV10
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV10_B_4_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_14weekdb_SV10
+        longLabel SV10_B_4_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_14weekdb
+        color 86,180,233
+        type bigWig
+
+        track HUVEC_14weekdb_SV11
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV11_B_5_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_14weekdb_SV11
+        longLabel SV11_B_5_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_14weekdb
+        color 86,180,233
+        type bigWig
+
+
+track HUVEC_24weekwt
+shortLabel HUVEC_24weekwt
+longLabel HUVEC_24weekwt
+container multiWig
+aggregate none
+showSubtrackColorOnUi on
+type bigWig
+autoScale on
+maxHeightPixels 128:50:11
+parent HUVEC
+
+        track HUVEC_24weekwt_SV13
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV13_C_1_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_24weekwt_SV13
+        longLabel SV13_C_1_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_24weekwt
+        color 86,180,233
+        type bigWig
+
+        track HUVEC_24weekwt_SV14
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV14_C_2_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_24weekwt_SV14
+        longLabel SV14_C_2_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_24weekwt
+        color 86,180,233
+        type bigWig
+
+        track HUVEC_24weekwt_SV15
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV15_C_3_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_24weekwt_SV15
+        longLabel SV15_C_3_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_24weekwt
+        color 86,180,233
+        type bigWig
+
+        track HUVEC_24weekwt_SV16
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV16_C_4_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_24weekwt_SV16
+        longLabel SV16_C_4_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_24weekwt
+        color 86,180,233
+        type bigWig
+
+        track HUVEC_24weekwt_SV17
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV17_C_5_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_24weekwt_SV17
+        longLabel SV17_C_5_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_24weekwt
+        color 86,180,233
+        type bigWig
+
+
+track HUVEC_24weekdb
+shortLabel HUVEC_24weekdb
+longLabel HUVEC_24weekdb
+container multiWig
+aggregate none
+showSubtrackColorOnUi on
+type bigWig
+autoScale on
+maxHeightPixels 128:50:11
+parent HUVEC
+
+        track HUVEC_24weekdb_SV18
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV18_D_1_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_24weekdb_SV18
+        longLabel SV18_D_1_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_24weekdb
+        color 86,180,233
+        type bigWig
+
+        track HUVEC_24weekdb_SV19
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV19_D_2_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_24weekdb_SV19
+        longLabel SV19_D_2_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_24weekdb
+        color 86,180,233
+        type bigWig
+
+
+        track HUVEC_24weekdb_SV21
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV21_D_4_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_24weekdb_SV21
+        longLabel SV21_D_4_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_24weekdb
+        color 86,180,233
+        type bigWig
+
+        track HUVEC_24weekdb_SV22
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV22_D_5_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_24weekdb_SV22
+        longLabel SV22_D_5_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_24weekdb
+        color 86,180,233
+        type bigWig
+
+        track HUVEC_24weekdb_SV23
+        bigDataUrl http://wilsonlab.org/liangxi/Fish_Hub/hg19/normalized_bw/SV23_D_6_R1_trimmed_Aligned.sortedByCoord.out.bw
+        shortLabel HUVEC_24weekdb_SV23
+        longLabel SV23_D_6_R1_trimmed_Aligned.sortedByCoord.out.bw
+        parent HUVEC_24weekdb
+        color 86,180,233
+        type bigWig
+
+
+http://wilsonlab.org/liangxi/Fish_Hub/hub.txt
+
+STAR the fastq files with mounse genome:
+
+STAR --runThreadN 8 --genomeDir /home/liangxi/mdwilson/genomes/hsap/star_index_2.5.1b/ --readFilesIn SV16_C_4_R1_trimmed.fastq --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix ./star_output/SV16_C_4_R1_trimmed_ &
+
+## output bigwig files!!!! ## this is not the good version of command above;;; ask huayun about the mouse star version???? 
 
 
 
 
+[1] FAM214B       VSIG2         AIFM2         THOC3         BLVRB         GNPTG         PROCR         RELB          COPS7A        ATN1          RPS25        
+[12] MYL12B        TICAM1        ITGB4         BLOC1S1       TMEM8B        PLPP2         SIK1          EMP3          WASH2P        GSN           MOV10        
+[23] RMND1         CRTC2         LY6E          ANGPTL4       CRADD         TMEM126A      PGAM1         BSG           PHLDA3        ZNF354C       CLDN7        
+[34] COA5          TRAIP         RNLS          CTD-2287O16.1 ZNF471        MKL1          UCKL1         RPL13P12      RP11-354K1.1  RPS23P8       RPL18P13     
+[45] H2AFJ         RP11-192H23.4 LARP4P  
+
+ [1] THOC3         GNPTG         RELB          ATN1          RPS25         TICAM1        SIK1          EMP3          WASH2P        CRTC2         PGAM1        
+[12] ZNF354C       CLDN7         TRAIP         RNLS          CTD-2287O16.1 UCKL1         RP11-354K1.1  RP11-192H23.4 LARP4P  
+
+/home/liangxi/mdwilson/external/STAR/bin/Linux_x86_64_static/STAR
+
+04/17/17
+STAR the mouse genome
+
+mmus_STAR --runThreadN 8 --genomeDir /home/liangxi/mdwilson/genomes/mmus/star_index_2.4.1d_modified --readFilesIn SV1_A_1_R1_trimmed.fastq.gz --readFilesCommand gunzip -c  --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix ./mmus_star_output/SV1_A_1_R1_trimmed_  --outWigType wiggle
+
+separte run in three terminals:
+(1)
+for i in SV[3-9]*trim*
+do 
+mmus_STAR --runThreadN 8 --genomeDir /home/liangxi/mdwilson/genomes/mmus/star_index_2.4.1d_modified --readFilesIn $i --readFilesCommand gunzip -c  --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix ./mmus_star_output/${i%%.*}"_"  --outWigType wiggle
+done
+
+(2)
+for i in SV1[0-7]*trim*
+do 
+mmus_STAR --runThreadN 8 --genomeDir /home/liangxi/mdwilson/genomes/mmus/star_index_2.4.1d_modified --readFilesIn $i --readFilesCommand gunzip -c  --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix ./mmus_star_output/${i%%.*}"_"  --outWigType wiggle
+done
+
+(3)
+for i in SV1_A_1_R1_trimmed.fastq.gz SV2_A_2_R1_trimmed.fastq.gz SV18_D_1_R1_trimmed.fastq.gz SV19_D_2_R1_trimmed.fastq.gz SV21_D_4_R1_trimmed.fastq.gz SV22_D_5_R1_trimmed.fastq.gz SV23_D_6_R1_trimmed.fastq.gz
+do 
+mmus_STAR --runThreadN 8 --genomeDir /home/liangxi/mdwilson/genomes/mmus/star_index_2.4.1d_modified --readFilesIn $i --readFilesCommand gunzip -c  --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix ./mmus_star_output/${i%%.*}"_"  --outWigType wiggle
+done
 
 
+# SV18 mapping to human genome: 6M; mouse genome: 1.6M; so to wonder how many are mouse-specific reads (0.7M)
+comm -12 <(samtools view SV18_D_1_R1_trimmed_Aligned.sortedByCoord.out.bam|cut -f1 |sort) <(samtools view ../star_output/bam/SV18_D_1_R1_trimmed_Aligned.sortedByCoord.out.bam | cut -f1|sort) | wc -l
+or,
+cat <(samtools view SV18_D_1_R1_trimmed_Aligned.sortedByCoord.out.bam|cut -f1 |sort) <(samtools view ../star_output/bam/SV18_D_1_R1_trimmed_Aligned.sortedByCoord.out.bam | cut -f1|sort) | uniq -d | wc -l
+
+
+comm -12 <(samtools view SV1_A_1_R1_trimmed_Aligned.sortedByCoord.out.bam|cut -f1 |sort) <(samtools view ../star_output/bam/SV1_A_1_R1_trimmed_Aligned.sortedByCoord.out.bam | cut -f1|sort) | wc -l &
+
+#!!!!gene counts are based on uiq reads; so do not worry; however, try to count human and mouse specific reads on unique reads:
+samtools view -bq 10 SV1_A_1_R1_trimmed_Aligned.sortedByCoord.out.bam >SV1_A_1_R1_trimmed_Aligned.sortedByCoord.out.uniqued.bam
+
+samtools view -bq 10 ../star_output/bam/SV1_A_1_R1_trimmed_Aligned.sortedByCoord.out.bam > ../star_output/bam/SV1_A_1_R1_trimmed_Aligned.sortedByCoord.out.uniqued.bam&
+
+samtools view ../star_output/bam/SV1_A_1_R1_trimmed_Aligned.sortedByCoord.out.bam|wc -l
+
+comm -12 <(samtools view SV1_A_1_R1_trimmed_Aligned.sortedByCoord.out.uniqued.bam|cut -f1 |sort) <(samtools view ../star_output/bam/SV1_A_1_R1_trimmed_Aligned.sortedByCoord.out.uniqued.bam | cut -f1|sort) | wc -l &
+
+	mouse_mapping	human_mapping	ambigous	mouse_specific
+SV1   	3.4				12.2		2.1			1.3			
+SV1_uniq	1.2			8.4			0.2			1
+
+# uniq all the bam files:
+for i in *out.bam
+do
+samtools view -bq 10 $i > ${i%.*}".uniqued.bam"&
+done
+
+check how many ambigous reads are in human and mouse uniquely mapped reads
+for i in *uniq*
+do
+echo $i
+comm -12 <(samtools view $i|cut -f1 |sort) <(samtools view ../star_output/bam/$i | cut -f1|sort) | wc -l
+done
+
+# the ambigous mappign reads percentage is pretty high (~13% in human uniquelly mapping reads) see how it likes in other 3utr samples
+/home/liangxi/mdwilson/repository_V2/fastq/
+WL729_none_na_Hek293_none_hsap_NA_nullTop2b_TCAG1.R1.fastq.gz
+WL730_none_na_Hek293_none_hsap_NA_nullTop2b_TCAG1.R1.fastq.gz
+
+#STAR: #mouse mapping
+for i in WL*
+do 
+mmus_STAR --runThreadN 8 --genomeDir /home/liangxi/mdwilson/genomes/mmus/star_index_2.4.1d_modified --readFilesIn $i --readFilesCommand gunzip -c  --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMtype BAM SortedByCoordinate --outFileNamePrefix ./mmus_star_output/${i%%.*}"_" 
+done
+
+#human genome
+
+for i in WL*
+do 
+STAR --runThreadN 8 --genomeDir /home/liangxi/mdwilson/genomes/hsap/star_index_2.5.1b/ --readFilesIn $i --readFilesCommand gunzip -c  --outFilterType BySJout --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outSAMtype BAM SortedByCoordinate --outFileNamePrefix ./hsap_star_output/${i%%.*}"_" 
+done
+
+comm -12 <(samtools view WL729_none_na_Hek293_none_hsap_NA_nullTop2b_TCAG1_Aligned.sortedByCoord.out.uniqued.bam|cut -f1 |sort) <(samtools view ../mmus_star_output/WL729_none_na_Hek293_none_hsap_NA_nullTop2b_TCAG1_Aligned.sortedByCoord.out.uniqued.bam | cut -f1|sort) | wc -l
+
+comm -12 <(samtools view WL730_none_na_Hek293_none_hsap_NA_nullTop2b_TCAG1_Aligned.sortedByCoord.out.uniqued.bam|cut -f1 |sort) <(samtools view ../mmus_star_output/WL730_none_na_Hek293_none_hsap_NA_nullTop2b_TCAG1_Aligned.sortedByCoord.out.uniqued.bam | cut -f1|sort) | wc -l &
 

@@ -1,0 +1,23 @@
+pipeline:
+1. fastqc: 
+look at raw reads; quality of sequencing 
+fastqc report: (1) normally it's fine; sequencing quality is high; while some bad quality tiles
+2. trimmomatic: 
+trim out bad quality reads
+3. STAR: 
+aligning reads; output gene counttable and bw files
+using UCSC genome browser to visulize RNA reads( or significant genes) https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg19&lastVirtModeType=default&lastVirtModeExtraState=&virtModeType=default&virtMode=0&nonVirtPosition=&position=chr17%3A32580371-32586145&hgsid=588697437_sMHfvJVWlONy51OQMFtCDcwoGW0M 
+mouse or human reads? (see the xlsx file) => don't think pronunced mouse transcripts detected
+4. qualimap: 
+metrics of the mapping reads (exonic reads mapping rate, or reads distribution over gene body)
+5. EdgeR: 
+differential analysis
+several groups cluster closely to each other
+24weekdb is more similar to PBS treatment and fewer significant genes;
+age is an important factor: 14weekdb and 14weekwt seems similar to each (no significant genes);
+however, 14weekdb vs 14weekwt show a lot of significant genes
+
+Another thing:
+the version of edgeR seems to affect the result a little.
+version in mac: 3.16.5  more generous significance calling
+version in desktop: 3.8.6 more stringent

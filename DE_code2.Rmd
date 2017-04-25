@@ -1,0 +1,374 @@
+---
+title: "3utr_DE"
+author: "DW"
+date: "April 3, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Remove outlier SV5 to see if anything changes
+*More differential genes come out after SV5 removal*
+This is a loose threshold; so at the end, more significant genes show up....
+around 95% got overlapped (tested in threeovelapgenes, fouroverlapgenes, 14weekdbvsPBS) 
+
+##pre-processing of the datasets
+
+the clustering (scaled-euclidean distance) shows that:
+1. SV5 is an outlier, may consider removing it; 
+2. each group can cluster together meaning the library are generally nice
+3. 14weekdb,14weekwt and 24week wt are one group; the other group is PBS and 24weekdb
+
+point3 explains why 24weekdbvsPBS have fewer significant genes and why 14weekdbvswt doesn't work
+
+additionally, the p_value distribution of 14weekdbvswt is an increased slope, could this be artifacts???
+
+test if 3utr works????
+
+genome browser look??
+
+batch effects???
+
+check on some individual dots to see if the significance is reliable??? check on the raw data and genome browser
+
+remove SV5
+
+
+techniqual:
+how to export the figures???
+
+
+```{r}
+library(edgeR)
+library(corrplot)
+library(gplots)
+library(made4)
+# read the countable and re-ordering it into a dataframe (data from STAR)
+path='/home/mdwilson/hpf_trial/liangxi/fastq/3utr_huvec/star_output/3utr_countable'
+utr_count<- read.table(path,sep="\t")
+coloumn_names=c("Ensembl_ID","SV10","SV11","SV13","SV14","SV15","SV16","SV17","SV18","SV19","SV1","SV20","SV21","SV22","SV23","SV2","SV3","SV4","SV5","SV6","SV7","SV8","SV9")
+colnames(utr_count) <- coloumn_names
+utr_count$SV20 <- NULL  #since SV20 is not working for sequencing 
+utr_count<- utr_count[,c(1,11,seq(15,22),seq(2,10),seq(12,14))]
+utr_count$SV5 <- NULL  #!!!remove SV5
+
+#create the design matrix
+design_colname <- factor(paste(rep("Sample",20),seq(20),sep=""))
+treat <- factor(c(rep("PBS",5),rep("exosomes",15)),levels=c("PBS","exosomes"))
+age <- factor(c(rep("NA",5),rep("14week",5),rep("24week",10)),levels=c("NA","14week","24week"))
+genotype <- factor(c(rep("NA",5),rep("wt",3),rep("db",2),rep("wt",5),rep("db",5)),levels=c("NA","wt","db"))
+group <- factor(paste(treat,age,genotype,sep=""),levels=c("PBSNANA","exosomes14weekwt","exosomes14weekdb","exosomes24weekwt","exosomes24weekdb"))
+design_matrix <- data.frame(treat,age,genotype,group,row.names = design_colname)
+
+
+
+#create a deglist object
+y <- DGEList(counts=utr_count[,2:21],genes=utr_count[,1],group=group) #!!!change 22 to 21, since remove SV5
+
+#filtering
+o <- order(rowSums(y$counts),decreasing = T)
+y <- y[o,]
+sum(rowSums(y$counts)!=0) #25366 genes that have at least one read in a libarary
+idx1 <- rowSums(cpm(y)>1)>2  #the filtering parameters recommended in 2013 nature portocol; 14439 genes remained
+y <- y[idx1,]
+y$samples$lib.size <- colSums(y$counts)
+y <- calcNormFactors(y)
+y$samples
+
+#create a design object; adding the coloumn names compared to the version without adding data parameters
+design <- model.matrix(~group,data=y$samples)
+
+#estimate the GLM dispersions
+y <- estimateDisp(y,design)
+
+plotBCV(y,cex=0.4) 
+# edger default pca (top genes, euclidean distances)
+plotMDS(y,cex=0.5)
+
+#corrlation matrix 
+M <- cor(data.frame(cpm(y)))
+corrplot.mixed(M)
+
+# home-made PCA; log transform first on library-normalized datasets(many 0s; so try with log(x+1))
+y1 <- data.frame(cpm(y))
+y1 <- log(y1+1)
+y1 <- as.data.frame(t(y1))
+y.pca <- prcomp(y1,
+                center=T,
+                scale.=T)
+
+# print(y.pca)
+# summary(y.pca)
+plot(y.pca, type="l") # the first two pca cannot interpret the whole data (22% and 12%)
+
+y2<- cbind(y1,treatment=paste(treat,age,genotype,sep="")) #with group labels
+library("ggfortify")
+autoplot(y.pca,label=T,data=y2,colour="treatment")
+
+# clustring and heatmap
+# the clustering shows that SV5 is an outlier!!! may consider removing it;
+# teh result of heatmap and heatmap.2 are quite different, based on PCA, trust heatmap; and SV5 is an outlier
+# comparing different distance mesure and linkage method
+# hcl <- function(x){hclust(x,method="average")}
+# heatmap.2(as.matrix(scale(t(y1))),scale="none",hclustfun =hcl)
+# 
+# distR <- as.dist(1-M)
+# hc <- hclust(distR,method="average")
+# heatmap.2(M,symm=T,Rowv=as.dendrogram(hc),trace="none",margins=c(7,7),cexRow = 0.9,cexCol = 0.9,scale="none") # manually 1-pearson and average
+
+# heatplot(scale(t(y1)),scale="none") # average $ 1-pearson correlation; this is to plot all the genes
+# clustering based on top 500 variable genes
+var <- function(x) sd(x)
+var.y1<- apply(t(y1),1,var)
+variable.y1 <- cbind(t(y1),var=var.y1)
+oo<- order(variable.y1[,"var"],decreasing=T)
+variable.y1 <- variable.y1[oo,]
+variable.y1<- variable.y1[1:500,]
+heatplot(scale(variable.y1[,1:20]),scale="none",labRow=F)
+
+
+```
+
+
+##GLM models for DE analysis
+the comparisons: [threshold: FDR<0.05, abs(logFC)>1]
+1. basal(PBS) + other four conditions (4 comparisons)
+2. the effects of db on gene experssion (2 comparisons)
+
+
+```{r}
+library(ggplot2)
+library(RColorBrewer)
+fit<- glmQLFit(y,design)
+qlf.14weekwtvsPBS <- glmQLFTest(fit,coef=2)
+genes_14weekwtvsPBS<- topTags(qlf.14weekwtvsPBS,n=length(qlf.14weekwtvsPBS))$table
+# look at p_value distribution
+ggplot(genes_14weekwtvsPBS,aes(x=PValue))+
+  geom_histogram(bins=100)+
+  geom_vline(xintercept = 0.1, linetype="dashed")+
+  labs(title="14weekwtvsPBS")
+# how many genes are  called significant? increased and decreased?
+nrow(genes_14weekwtvsPBS[genes_14weekwtvsPBS$FDR< 0.05,])
+nrow(genes_14weekwtvsPBS[genes_14weekwtvsPBS$FDR< 0.05 & genes_14weekwtvsPBS$logFC>1,])
+upgene <- genes_14weekwtvsPBS[genes_14weekwtvsPBS$FDR< 0.05 & genes_14weekwtvsPBS$logFC>1,]
+nrow(genes_14weekwtvsPBS[genes_14weekwtvsPBS$FDR< 0.05 & genes_14weekwtvsPBS$logFC< -1,])
+downgene <- genes_14weekwtvsPBS[genes_14weekwtvsPBS$FDR< 0.05 & genes_14weekwtvsPBS$logFC< -1,]
+
+#plot MA plot
+color <- brewer.pal(n=3,name="Set1")
+
+ggplot(genes_14weekwtvsPBS,aes(x=logCPM,y=logFC))+
+  geom_point(alpha=0.3)+
+  geom_point(data=upgene, aes(x=logCPM,y=logFC,color=color[2]),alpha=0.5)+
+  geom_point(data=downgene, aes(x=logCPM,y=logFC,color=color[1]),alpha=0.5)+
+  labs(color="",title="14weekwtvsPBS")+
+  scale_color_manual(labels=c("increased","decreased"),values=c(color[1],color[2]))+
+  geom_hline(yintercept = c(1,-1),color="magenta",linetype="dashed")
+  
+#volcano plot
+ggplot(genes_14weekwtvsPBS,aes(x=logFC,y=-log10(PValue)))+
+  geom_point(alpha=0.3)+
+  geom_point(data=upgene, aes(x=logFC,y=-log10(PValue),color=color[2]),alpha=0.5)+
+  geom_point(data=downgene, aes(x=logFC,y=-log10(PValue),color=color[1]),alpha=0.5)+
+  labs(color="",title="14weekwtvsPBS")+
+  scale_color_manual(labels=c("increased","decreased"),values=c(color[1],color[2]))+
+  geom_vline(xintercept = c(1,-1),color="magenta",linetype="dashed")
+
+
+
+# qlf.14weekdbvsPBS
+# qlf.24weekwtvsPBS
+# qlf.24weekdbvsPBS
+
+```
+
+
+```{r}
+# write a function
+DE.analyze<- function(y, design, comparison.name){
+  # input: a DGEList object that has been counted for dispersion and TMM normalized; design is a design matrix generated by model.matrix; comparison.name is a string, such as: 14weekwtvsPBS || weird bug: can not take 24weekdbvswt or 14weekdbvswt => because all genes in 14weekdbvswt have FDR eaqual to 1 which means no significant genes in 14weekdbvswt
+  # output:the filtered and normalized all_genes, upgenes and down_genes
+  # this function is to fit the model by taking the normalized and filtered DGEList object and plot MAplot, volcano plot and p-value distributions
+  library(ggplot2)
+  library(RColorBrewer)
+  comparison.list <- list("14weekwtvsPBS"=2,"14weekdbvsPBS"=3,"24weekwtvsPBS"=4,"24weekdbvsPBS"=5,"24weekdbvswt"=c(0,0,0,-1,1))
+  fit<- glmQLFit(y,design)
+  if (length(comparison.list[[comparison.name]])<2){
+  qlf <- glmQLFTest(fit,coef =comparison.list[[comparison.name]])} else
+    qlf <- glmQLFTest(fit,contrast =comparison.list[[comparison.name]])
+  all_genes<- topTags(qlf,n=length(qlf))$table
+  # look at p_value distribution
+  fig1<- ggplot(all_genes,aes(x=PValue))+
+    geom_histogram(bins=100)+
+    geom_vline(xintercept = 0.1, linetype="dashed")+
+    labs(title=comparison.name)
+  # how many genes are  called significant? increased and decreased?
+  nrow(all_genes[all_genes$FDR< 0.05,])
+  nrow(all_genes[all_genes$FDR< 0.05 & all_genes$logFC>1,])
+  upgene <- all_genes[all_genes$FDR< 0.05 & all_genes$logFC>1,]
+  nrow(all_genes[all_genes$FDR< 0.05 & all_genes$logFC< -1,])
+  downgene <- all_genes[all_genes$FDR< 0.05 & all_genes$logFC< -1,]
+  
+  #plot MA plot
+  color <- brewer.pal(n=3,name="Set1")
+  
+  fig2<- ggplot(all_genes,aes(x=logCPM,y=logFC))+
+    geom_point(alpha=0.3)+
+    geom_point(data=upgene, aes(x=logCPM,y=logFC,color=color[2]),alpha=0.5)+
+    geom_point(data=downgene, aes(x=logCPM,y=logFC,color=color[1]),alpha=0.5)+
+    labs(color="",title=comparison.name)+
+    scale_color_manual(labels=c("increased","decreased"),values=c(color[1],color[2]))+
+    geom_hline(yintercept = c(1,-1),color="magenta",linetype="dashed")
+  #volcano plot
+  fig3 <- ggplot(all_genes,aes(x=logFC,y=-log10(PValue)))+
+    geom_point(alpha=0.3)+
+    geom_point(data=upgene, aes(x=logFC,y=-log10(PValue),color=color[2]),alpha=0.5)+
+    geom_point(data=downgene, aes(x=logFC,y=-log10(PValue),color=color[1]),alpha=0.5)+
+    labs(color="",title=comparison.name)+
+    scale_color_manual(labels=c("increased","decreased"),values=c(color[1],color[2]))+
+    geom_vline(xintercept = c(1,-1),color="magenta",linetype="dashed")
+  print(fig1)
+  print(fig2)
+  print(fig3)
+  return(list(all_genes,upgene,downgene))
+}
+
+#plot the first group of comparison figures + "24weekdbvswt" 
+Genes<- list(week14wtvsPBS="",week14dbvsPBS="",week24wtvsPBS="",week24dbvsPBS="",week24dbvswt="") #note the names got a little modified
+comparison.outlist <- list("14weekwtvsPBS","14weekdbvsPBS","24weekwtvsPBS","24weekdbvsPBS","24weekdbvswt")
+for (i in 1:length(comparison.outlist)){
+Genes[[i]]<- DE.analyze(y,design,comparison.outlist[[i]])
+}
+
+## plot 14weekdbvswt ;;; it met a bug; cause no genes with FDR <0.5; all genes have FDR equal to 1
+comparison.list <- list("14weekdbvswt"=c(0,-1,1,0,0),"24weekdbvswt"=c(0,0,0,-1,1))
+fit<- glmQLFit(y,design)
+qlf <- glmQLFTest(fit,contrast =comparison.list[["14weekdbvswt"]])
+all_genes<- topTags(qlf,n=length(qlf))$table
+# look at p_value distribution
+fig1<- ggplot(all_genes,aes(x=PValue))+
+  geom_histogram(bins=100)+
+  geom_vline(xintercept = 0.1, linetype="dashed")+
+  labs(title="14weekdbvswt")
+# how many genes are  called significant? increased and decreased?
+nrow(all_genes[all_genes$FDR< 0.05,])
+nrow(all_genes[all_genes$FDR< 0.05 & all_genes$logFC>1,])
+upgene <- all_genes[all_genes$FDR< 0.05 & all_genes$logFC>1,]
+nrow(all_genes[all_genes$FDR< 0.05 & all_genes$logFC< -1,])
+downgene <- all_genes[all_genes$FDR< 0.05 & all_genes$logFC< -1,]
+#plot MA plot
+color <- brewer.pal(n=3,name="Set1")
+fig2<- ggplot(all_genes,aes(x=logCPM,y=logFC))+
+  geom_point(alpha=0.3)+
+  geom_point(data=upgene, aes(x=logCPM,y=logFC,color=color[2]),alpha=0.5)+
+  geom_point(data=downgene, aes(x=logCPM,y=logFC,color=color[1]),alpha=0.5)+
+  labs(color="",title="14weekdbvswt")+
+  scale_color_manual(labels=c("increased","decreased"),values=c(color[1],color[2]))+
+  geom_hline(yintercept = c(1,-1),color="magenta",linetype="dashed")
+#volcano plot
+fig3 <- ggplot(all_genes,aes(x=logFC,y=-log10(PValue)))+
+  geom_point(alpha=0.3)+
+  geom_point(data=upgene, aes(x=logFC,y=-log10(PValue),color=color[2]),alpha=0.5)+
+  geom_point(data=downgene, aes(x=logFC,y=-log10(PValue),color=color[1]),alpha=0.5)+
+  labs(color="",title="14weekdbvswt")+
+  scale_color_manual(labels=c("increased","decreased"),values=c(color[1],color[2]))+
+  geom_vline(xintercept = c(1,-1),color="magenta",linetype="dashed")
+print(fig1)
+# print(fig2)
+# print(fig3)
+
+```
+
+##the significant genes
+
+```{r}
+library(gProfileR)
+#use gprofileR to convert the ensemble ID to gene naems
+#plot the venn diagram
+week14wtvsPBS <- c(as.character(Genes$week14wtvsPBS[[2]]$genes),as.character(Genes$week14wtvsPBS[[3]]$genes)) # all the significant genes
+week14dbvsPBS <- c(as.character(Genes$week14dbvsPBS[[2]]$genes),as.character(Genes$week14dbvsPBS[[3]]$genes))
+week24wtvsPBS <- c(as.character(Genes$week24wtvsPBS[[2]]$genes),as.character(Genes$week24wtvsPBS[[3]]$genes))
+week24dbvsPBS <- c(as.character(Genes$week24dbvsPBS[[2]]$genes),as.character(Genes$week24dbvsPBS[[3]]$genes))
+venn(list(week14wtvsPBS=week14wtvsPBS,week14dbvsPBS=week14dbvsPBS,week24wtvsPBS=week24wtvsPBS,week24dbvsPBS=week24dbvsPBS))
+
+#plot the significant genes numbers
+week14wtvsPBS.genes <- c(nrow(Genes$week14wtvsPBS[[2]]),nrow(Genes$week14wtvsPBS[[3]]))
+week14dbvsPBS.genes <- c(nrow(Genes$week14dbvsPBS[[2]]),nrow(Genes$week14dbvsPBS[[3]]))
+week24wtvsPBS.genes <- c(nrow(Genes$week24wtvsPBS[[2]]),nrow(Genes$week24wtvsPBS[[3]]))
+week24dbvsPBS.genes <- c(nrow(Genes$week24dbvsPBS[[2]]),nrow(Genes$week24dbvsPBS[[3]]))
+week24dbvswt.genes <- c(nrow(Genes$week24dbvswt[[2]]),nrow(Genes$week24dbvswt[[3]]))
+comparison.type <- c(rep("14weekwtvsPBS",2),rep("14weekdbvsPBS",2),rep("24weekwtvsPBS",2),rep("24weekdbvsPBS",2),rep("24weekdbvswt",2))
+comparison.type <- factor(comparison.type,levels=c("14weekwtvsPBS","14weekdbvsPBS","24weekwtvsPBS","24weekdbvsPBS","24weekdbvswt"))
+change <- rep(c("sig increased","sig decreased"),5)
+gene.number <- c(week14wtvsPBS.genes,week14dbvsPBS.genes,week24wtvsPBS.genes,week24dbvsPBS.genes,week24dbvswt.genes)
+d<- data.frame(comparison.type=comparison.type,change=change,gene.number=gene.number)
+ggplot(d,aes(x=comparison.type,y=gene.number,fill=factor(change)))+
+  geom_bar(stat="identity",position="dodge")+
+  labs(title="significant gene numbers")
+
+# plot venn diagram of the significantly increased or decreased genes; up is always up; the same as down_genes
+# increased
+week14wtvsPBS.up <- c(as.character(Genes$week14wtvsPBS[[2]]$genes)) 
+week14dbvsPBS.up <- c(as.character(Genes$week14dbvsPBS[[2]]$genes))
+week24wtvsPBS.up <- c(as.character(Genes$week24wtvsPBS[[2]]$genes))
+week24dbvsPBS.up <- c(as.character(Genes$week24dbvsPBS[[2]]$genes))
+venn(list(week14wtvsPBS.up=week14wtvsPBS.up,week14dbvsPBS.up=week14dbvsPBS.up,week24wtvsPBS.up=week24wtvsPBS.up,week24dbvsPBS.up=week24dbvsPBS.up))
+
+# decreased 
+week14wtvsPBS.down <- c(as.character(Genes$week14wtvsPBS[[3]]$genes)) 
+week14dbvsPBS.down <- c(as.character(Genes$week14dbvsPBS[[3]]$genes))
+week24wtvsPBS.down <- c(as.character(Genes$week24wtvsPBS[[3]]$genes))
+week24dbvsPBS.down <- c(as.character(Genes$week24dbvsPBS[[3]]$genes))
+venn(list(week14wtvsPBS.down=week14wtvsPBS.down,week14dbvsPBS.down=week14dbvsPBS.down,week24wtvsPBS.down=week24wtvsPBS.down,week24dbvsPBS.down=week24dbvsPBS.down))
+
+#convert emsemble ID to gene ID
+#######
+#overlap changed genes
+# the 28 all-overlapped genes 
+fouroverlap.upID <- Reduce(intersect,list(week14wtvsPBS.up,week14dbvsPBS.up,week24wtvsPBS.up,week24dbvsPBS.up))
+fouroverlap.upID1 <- unlist(strsplit(fouroverlap.upID,"[.]")) #to remove the one digit after "."
+fouroverlap.upID1 <- fouroverlap.upID1[seq(1,length(fouroverlap.upID1),2)]
+fouroverlap.upgenes<- gconvert(fouroverlap.upID1, organism = "hsapiens", target = "ENSG", region_query = F,numeric_ns = "", mthreshold = Inf, filter_na = T, df = T)
+fouroverlap.upgenes <- fouroverlap.upgenes$name
+
+fouroverlap.downID <- Reduce(intersect,list(week14wtvsPBS.down,week14dbvsPBS.down,week24wtvsPBS.down,week24dbvsPBS.down))
+fouroverlap.downID1 <- unlist(strsplit(fouroverlap.downID,"[.]")) #to remove the one digit after "."
+fouroverlap.downID1 <- fouroverlap.downID1[seq(1,length(fouroverlap.downID1),2)]
+fouroverlap.downgenes<- gconvert(fouroverlap.downID1, organism = "hsapiens", target = "ENSG", region_query = F,numeric_ns = "", mthreshold = Inf, filter_na = T, df = T)
+fouroverlap.downgenes <- fouroverlap.downgenes$name
+# the three overlapped genes (minus 24 weekdbvsPBS) # 7 are missing; meanning these 7 regions are not specific genes
+threeoverlap.upID <- Reduce(intersect,list(week14wtvsPBS.up,week14dbvsPBS.up,week24wtvsPBS.up))
+threeoverlap.upID1 <- unlist(strsplit(threeoverlap.upID,"[.]")) #to remove the one digit after "."
+threeoverlap.upID1 <- threeoverlap.upID1[seq(1,length(threeoverlap.upID1),2)]
+threeoverlap.upgenes<- gconvert(threeoverlap.upID1, organism = "hsapiens", target = "ENSG", region_query = F,numeric_ns = "", mthreshold = Inf, filter_na = T, df = T)
+threeoverlap.upgenes <- threeoverlap.upgenes$name
+
+threeoverlap.downID <- Reduce(intersect,list(week14wtvsPBS.down,week14dbvsPBS.down,week24wtvsPBS.down))
+threeoverlap.downID1 <- unlist(strsplit(threeoverlap.downID,"[.]")) #to remove the one digit after "."
+threeoverlap.downID1 <- threeoverlap.downID1[seq(1,length(threeoverlap.downID1),2)]
+threeoverlap.downgenes<- gconvert(threeoverlap.downID1, organism = "hsapiens", target = "ENSG", region_query = F,numeric_ns = "", mthreshold = Inf, filter_na = T, df = T)
+threeoverlap.downgenes <- threeoverlap.downgenes$name
+#######
+# significant genes of 24weekdbvswt
+week24dbvswt.upID <- unlist(strsplit(as.character(Genes$week24dbvswt[[2]]$genes),"[.]"))
+week24dbvswt.upID <- week24dbvswt.upID[seq(1,length(week24dbvswt.upID),2)]
+week24dbvswt.upgenes<- gconvert(week24dbvswt.upID, organism = "hsapiens", target = "ENSG", region_query = F,numeric_ns = "", mthreshold = Inf, filter_na = T, df = T)
+week24dbvswt.upgenes<- week24dbvswt.upgenes$name
+
+week24dbvswt.downID <- unlist(strsplit(as.character(Genes$week24dbvswt[[3]]$genes),"[.]"))
+week24dbvswt.downID <- week24dbvswt.downID[seq(1,length(week24dbvswt.downID),2)]
+week24dbvswt.downgenes<- gconvert(week24dbvswt.downID, organism = "hsapiens", target = "ENSG", region_query = F,numeric_ns = "", mthreshold = Inf, filter_na = T, df = T)
+week24dbvswt.downgenes <- week24dbvswt.downgenes$name
+
+# GO enrichment analysis
+# gprofiler(as.character(fouroverlap.upgenes),organism = "hsapiens") ## no enrichment here; 
+# gprofiler(as.character(fouroverlap.downgenes),organism = "hsapiens") ## similarly, metal ion pathways
+# 
+# gprofiler(as.character(threeoverlap.upgenes),organism = "hsapiens") # 
+# gprofiler(as.character(threeoverlap.downgenes),organism = "hsapiens") #
+# 
+# gprofiler(as.character(week24dbvswt.upgenes),organism = "hsapiens") ## 
+# gprofiler(as.character(week24dbvswt.downgenes),organism = "hsapiens") # still broad and hard to interpret  
+```
+
