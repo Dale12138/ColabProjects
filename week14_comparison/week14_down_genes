@@ -1,0 +1,57 @@
+########### week14wtvsPBS and week14dbvsPBS overlap genes
+ [1] ANKIB1      RPAP3       MYCBP2      DBF4        CLK1        AKAP11      VRK2        EIF2AK2     PKN2        ASPM        KIF2A      
+ [12] PABPC1      HMMR        FNDC3B      KLHL20      SENP1       BZW1        ME2         TNPO1       MRPL28      FUS         BTAF1      
+ [23] FBXL19      NDUFB7      CHD8        MIB1        STAG2       EMD         NFAT5       FAM173A     TJP1        UBXN8       CDK6       
+ [34] PLEKHA1     PALD1       EDRF1       RAPGEF2     KLF3        DDX6        CBL         C11ORF58    MAN2A1      CLINT1      PDCD10     
+ [45] PSMD14      TAF1B       RND3        AAK1        ASH1L       ACADM       KLF9        SET         RAB14       HOXB3       UTP20      
+ [56] ITPR2       AGO2        ARFGEF2     MT1G        ALKBH7      UBR4        MPST        FLNC        PUS7L       ABHD17A     JUND       
+ [67] MICAL2      HSD17B4     TMEM165     RC3H1       C2ORF49     RAPGEF5     CDK9        FNBP1L      ARHGAP29    CEP55       AP1AR      
+ [78] SEC31A      FAM60A      PRICKLE1    SLC7A1      GLYR1       PMM2        SERBP1      TPM3        RBMX        HMBOX1      ITGB1      
+ [89] DOCK1       FOXO1       SRFBP1      EPG5        EEF1A1      MFSD14A     BUB1B       SHROOM4     PAXBP1      UBE2Z       SAFB       
+[100] ZYG11B      PLPP3       NOL9        ZNF281      ARL5A       RYBP        ZNF148      STRBP       WRN         PRPF18      NSD1       
+[111] XRRA1       NAV2        CDK12       DAPK3       PBK         ZSWIM1      CSNK1G1     MT1E        ARL6IP1     KDM2A       TNFRSF10D  
+[122] CTU2        C19ORF70    RUVBL1      UNC119B     YES1        ATAD5       USF3        PTPN11      RELL1       JRKL        PRR14L     
+[133] RBM12B      C9ORF47     ZFP91       TCEA1       FAT4        STRN3       HIST1H4C    HELZ        PAPSS2      L3MBTL3     SNORD104   
+[144] Y_RNA       RNU4-2      RUFY2       RNF5        MT1M        NYNRIN      SNORA19     MT-TC       MT-TS1      MT-TR       MT-RNR1    
+[155] SNORA79     FANCG       SNORA79     MIR663AHG   RP5-884M6.1 BMS1P10     SNORD13     C4ORF48     SHANK3      RNA5-8SP6   RNU6-758P  
+[166] RNY4        ALG11       RPL41P5     RNU4ATAC    MTRNR2L2   
+
+
+######################### week14wtvsPBS only genes
+ [1] SLC25A13      AKAP8L        ARHGAP10      CLCN4         ACTR6         RARB          HIVEP1        DCAF11        CAPN15       
+[10] EHD4          CHRAC1        BCAT2         TFEC          TRIM14        NPM3          LPCAT3        RNF8          RARS         
+[19] POLE4         KDM3A         PRDM2         STAG1         PKD2          NT5C3A        CKS2          DNAJC8        RHOT1        
+[28] KLHDC10       TMEM160       RBM38         MEIS2         TMEM258       CLOCK         PNPLA8        LRCH1         CMTR1        
+[37] THAP12        LNX2          SERF2         CRTC3         ITGB3BP       KIF2C         CEP170        CSRNP1        RABL3        
+[46] OSBPL11       ATP10D        TUT1          QTRT2         HAUS1         CCNB2         ELK4          YY1AP1        NSA2         
+[55] SNAPC3        MELK          WEE1          IGF2          AXL           KRT80         IRF2          MRPL1         INSR         
+[64] GNG12         CBX2          PUS1          NT5DC1        LRRC75A       C8ORF33       KPNA2         SIGIRR        TLE1         
+[73] MT1F          LTN1          RNA5-8SP2     RNY1          SNORA72       SNORA80E      SNORA12       ARHGAP19      SYNJ2BP      
+[82] MRPL23        RP13-104F24.2 ETV5          SCARNA22      SCARNA9       RPPH1         CTC-425F1.4   RMRP   
+
+############## week14dbvsPBS only genes
+  [1] FKBP4       RBM6        PRKAR2B     CREBBP      PAF1        MYLIP       SPAG9       ST3GAL1     REV3L       BTBD7       ZMYND11    
+ [12] MATR3       KPNA6       TRIO        SKIV2L2     SPDL1       TPR         R3HDM1      ADAMTS6     LTBP1       POLQ        PLEKHA5    
+ [23] KMT2C       ZFR         TAF2        SPEN        YBX1        EVI5        DNTTIP2     ROCK1       PRR11       ATP2B1      HLTF       
+ [34] NUAK1       MAP2K7      SYNJ2       SDF4        DDX1        MEF2C       WDR70       ERC1        KAT6A       ZMPSTE24    REST       
+ [45] GNA11       PABPC4      TNRC6A      RBM27       OSBPL8      HECTD1      CBX5        SRPK1       CDC5L       PALMD       TNRC6B     
+ [56] KIAA0586    DICER1      TRIP11      SMCHD1      TBL1X       EEA1        ARMCX3      DNAJC3      KPNA3       USP10       MYEF2      
+ [67] NOVA2       HOXA5       RBM28       SPIN1       TLE4        NCS1        MPDZ        RAB11FIP2   FAM208B     SMC3        WSB1       
+ [78] SLAIN2      FNBP4       OSBP        E2F3        PHACTR2     PRPF4B      ERBIN       LMNB1       PPWD1       TCERG1      SMAD5      
+ [89] AMOTL2      FXR1        BBX         INO80B      BIRC6       NFE2L2      EPHA4       MTR         CENPF       KMT2A       PHF3       
+[100] CTNNAL1     KDSR        HELLS       ELF1        NCAPH       PAPD5       TBC1D15     COPA        CCDC18      MED13L      WWP1       
+[111] RREB1       MT2A        CENPB       TMX4        RRBP1       HNRNPR      KTN1        YWHAH       HERC2       MIS18BP1    GNL3L      
+[122] ZSWIM6      ZC3H4       PPIL4       SH3BP5      ENOSF1      DCTN4       SRRM1       BTG1        SWAP70      FAM127A     ZCCHC11    
+[133] TES         GCC2        BZW2        EPRS        CBWD2       STX17       PRPF4       TLN1        TGS1        YAP1        ADCY3      
+[144] ACTR2       MYOF        KIF20B      G3BP2       PPP3CA      FGD4        NEDD1       NUP58       SBNO1       PDPK1       TAF4B      
+[155] WDR45B      MTF2        TMF1        LPP         SLIT2       PIK3R1      N4BP3       SHPRH       CEP78       UGCG        TCF7L2     
+[166] MKI67       TAOK2       ZNF827      BICD1       SAV1        DST         MBNL1       UTRN        SMARCA5     RANBP2      RBMS1      
+[177] CNKSR3      PPP2R5E     ENAH        ELMSAN1     LRP8        STEAP2      WASF2       COLEC12     CSRP1       PCNT        ZNF714     
+[188] TAOK1       JAK1        EXTL2       DDR2        IWS1        CCNYL1      ARPC2       WDR43       DNAJB14     NAA15       CFAP97     
+[199] CREBRF      DLC1        RAD21       ZNF22       BMS1        TRIM44      KIAA0355    HOOK3       FILIP1L     CDC40       DNAJC21    
+[210] TSPAN5      SIN3A       ZEB2        BRD3        ZNF768      ZNF35       MFN1        BPTF        ATF7IP      TMCC1       ABLIM3     
+[221] GOLGB1      AKIRIN1     KLC2        ZNF654      YPEL2       CKAP5       ZBTB38      NECTIN3     GRB2        PLEC        SUZ12      
+[232] KCTD12      MYADM       PAK2        SETD2       CREB3L2     NTM         PTP4A2      EFNA5       H1FX        RBM43       FAM43A     
+[243] NR2F2       AHNAK2      SESTD1      TET3        ERC2        HIST1H1C    H2AFX       NOC2L       SPATS2L     TCF4        MAML3      
+[254] PPTC7       SCN8A       ZNF585A     SIPA1L1     MIER1       CEP290      ZNF521      TOP1        NOS1AP      MT1H        ITSN1      
+[265] ITPRIPL2    MT-RNR2     SFT2D2      BX322557.10 MT-ATP8     RN7SL559P   GABPB1-AS1  MTCYBP35    MIR100HG    ZBED6       ITGB3

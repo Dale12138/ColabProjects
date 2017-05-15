@@ -8,6 +8,26 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+## function part
+
+```{r}
+IDconversion <- function(ENSG_vector){
+  # input a string vector like "ENSG0000.5"
+  # output: a gene name
+  # this function is to convert the new version of ENSG name to gene name/ if there's no "." then convert directly
+  library(gProfileR)
+  if (length(grep("\\.",ENSG_vector))>2){
+    #this if is based on the ENSG_vector length greater than 2
+    ID <- unlist(strsplit(ENSG_vector,"[.]")) #to remove the one digit after "."
+    ENSG_vector <- ID[seq(1,length(ID),2)]
+  }
+  gene.name<- gconvert(ENSG_vector, organism = "hsapiens", target = "ENSG", region_query = F,numeric_ns = "", mthreshold = Inf, filter_na = T, df = T)
+  gene.name <- gene.name$name
+  return(gene.name)
+}
+
+```
+
 
 ##pre-processing of the datasets
 
@@ -328,7 +348,7 @@ fouroverlap.upgenes <- fouroverlap.upgenes$name
 fouroverlap.downID <- Reduce(intersect,list(week14wtvsPBS.down,week14dbvsPBS.down,week24wtvsPBS.down,week24dbvsPBS.down))
 fouroverlap.downID1 <- unlist(strsplit(fouroverlap.downID,"[.]")) #to remove the one digit after "."
 fouroverlap.downID1 <- fouroverlap.downID1[seq(1,length(fouroverlap.downID1),2)]
-fouroverlap.downgenes<- gconvert(fouroverlap.downID1, organism = "hsapiens", target = "ENSG", region_query = F,numeric_ns = "", mthreshold = Inf, filter_na = T, df = T)
+fouroverlap.downgenes<- gconvert(fouroverlap.downID1, organism = "hsapiens",target = "ENSG", region_query = F,numeric_ns = "", mthreshold = Inf, filter_na = T, df = T)
 fouroverlap.downgenes <- fouroverlap.downgenes$name
 # the three overlapped genes (minus 24 weekdbvsPBS) # 7 are missing; meanning these 7 regions are not specific genes
 threeoverlap.upID <- Reduce(intersect,list(week14wtvsPBS.up,week14dbvsPBS.up,week24wtvsPBS.up))
@@ -363,5 +383,56 @@ week24dbvswt.downgenes <- week24dbvswt.downgenes$name
 # 
 # gprofiler(as.character(week24dbvswt.upgenes),organism = "hsapiens") ##24weekdbvswt  nitrogen compound pathways; viral process
 # gprofiler(as.character(week24dbvswt.downgenes),organism = "hsapiens") # a little broad
+```
+
+# rough comparsions of 14weekwtvsPBS & 14weekdbvsPBS
+
+```{r}
+# increased
+week14wtvsPBS.up <- c(as.character(Genes$week14wtvsPBS[[2]]$genes)) 
+week14dbvsPBS.up <- c(as.character(Genes$week14dbvsPBS[[2]]$genes))
+venn(list(week14wtvsPBS.up=week14wtvsPBS.up,week14dbvsPBS.up=week14dbvsPBS.up))
+
+# decreased 
+week14wtvsPBS.down <- c(as.character(Genes$week14wtvsPBS[[3]]$genes)) 
+week14dbvsPBS.down <- c(as.character(Genes$week14dbvsPBS[[3]]$genes))
+venn(list(week14wtvsPBS.down=week14wtvsPBS.down,week14dbvsPBS.down=week14dbvsPBS.down))
+
+##three groups of each category and the GO enrichment analysis [up genes]
+ii <- week14wtvsPBS.up %in% week14dbvsPBS.up
+week14overlap.up <- week14wtvsPBS.up[ii]
+week14wtvsPBS.up.uniq <- week14wtvsPBS.up[!ii]
+week14dbvsPBS.up.uniq <- week14dbvsPBS.up[!(week14dbvsPBS.up %in% week14wtvsPBS.up)]
+#to acquire the genename, pass the to IDconversion function
+# IDconversion(week14overlap.up)
+# IDconversion(week14wtvsPBS.up.uniq)
+# IDconversion(week14dbvsPBS.up.uniq)
+
+#look at the GO enrichment 
+# gprofiler(as.character(IDconversion(week14overlap.up)),organism = "hsapiens") #Glucagon signaling pathway
+# gprofiler(as.character(IDconversion(week14wtvsPBS.up.uniq)),organism = "hsapiens") # BMP4-BGN complex
+# gprofiler(as.character(IDconversion(week14dbvsPBS.up.uniq)),organism = "hsapiens") # ER, membrane protein, viral stuff
+
+########
+#[down genes]
+ii <- week14wtvsPBS.down %in% week14dbvsPBS.down
+week14overlap.down <- week14wtvsPBS.down[ii]
+week14wtvsPBS.down.uniq <- week14wtvsPBS.down[!ii]
+week14dbvsPBS.down.uniq <- week14dbvsPBS.down[!(week14dbvsPBS.down %in% week14wtvsPBS.down)]
+#to acquire the genename, pass the to IDconversion function
+# IDconversion(week14overlap.down)
+# IDconversion(week14wtvsPBS.down.uniq)
+# IDconversion(week14dbvsPBS.down.uniq)
+
+#look at the GO enrichment 
+# gprofiler(as.character(IDconversion(week14overlap.down)),organism = "hsapiens") # membrane and cell adhesion
+# gprofiler(as.character(IDconversion(week14wtvsPBS.down.uniq)),organism = "hsapiens")  # nuclear division, nitrogen metabolic, RNA metabolic and many otehr metabolic processes
+# gprofiler(as.character(IDconversion(week14dbvsPBS.down.uniq)),organism = "hsapiens") # nitrogen metabolic and other metabolic proccess and chromosome organization and negative genetic regression or gene silencing
+
+```
+
+```{r}
+# proteincoding.ENG <- readRDS("/home/mdwilson/hpf_trial/huayun/ganno/hg19/transcriptome/hg19_gencode_v19_geneType.rds")  ## all the 50,000 genes information (hg19)!!!
+
 ```
 

@@ -1,0 +1,80 @@
+########### week14wtvsPBS and week14dbvsPBS overlap genes
+  [1] POLR2J        ZNF263        PKD1          MED24         IFFO1         STAB1         LYPLA2        TTC19         VSIG2        
+ [10] AIFM2         THOC3         ISOC2         CTSA          ZNF76         RASSF1        GPKOW         BCL3          GRAMD4       
+ [19] SNRPA         GSTP1         AGBL5         BLVRB         GNPTG         PSMD8         CRYBB2P1      ASCC2         SLC25A17     
+ [28] PYGL          PROCR         HM13          GPR143        PLP2          HCFC1R1       PYCARD        CSK           EEF1D        
+ [37] GYS1          RELB          TLE6          GCDH          NOD1          NUDT1         RPL28         SLC25A11      BLMH         
+ [46] DPH1          CCDC86        SLC35F2       COPS7A        ING4          ATN1          KANSL3        AUP1          FN1          
+ [55] LAMTOR2       MIIP          ECE1          RPS25         MYL12B        PDLIM2        POLR3GL       ACOT9         DDX39A       
+ [64] GIPC1         NQO2          SLC25A19      ITPA          RBM42         TICAM1        ATF4          RPL36         MAP1S        
+ [73] ADRM1         LRRC47        NDUFA2        NINJ1         SLC39A11      AGAP3         FHOD1         RPL13AP25     SLC2A8       
+ [82] IL11RA        TMEM8B        RPS24         RPL14P1       SGSM2         SAT2          PLPP2         SH3GL1        SIK1         
+ [91] EMP3          MOB3C         ENSA          TMEM44        WASH2P        MRPS28        GPR107        PPRC1         TIMM8B       
+[100] C12ORF45      MOV10         SCUBE1        CTBP1         CCDC107       C21ORF33      CRTC2         LY6E          TMEM79       
+[109] RFC4          DCBLD1        RPUSD4        STK32C        IFI27         DCHS1         ENDOG         SEMA6B        ANGPTL4      
+[118] PRDX2         TMEM88        BMP1          TMEM208       PPIP5K1       CRADD         DCXR          SF3B5         MGMT         
+[127] PGAM1         BCL2L1        BSG           SELP          PHLDA3        PTDSS2        TUBB6         PLA2G16       ZNF354C      
+[136] SH2B1         RRS1          CLDN7         PRKAG1        UBA7          TRAPPC6B      SFXN4         TRMT12        TRAIP        
+[145] SNRNP35       RNLS          TMEM186       CTD-2287O16.1 NDUFA13       RNF220        C11ORF95      S100A13       ZNF569       
+[154] MKL1          SRC           FCHSD1        RPS4X         UCKL1         CCDC167       DFNB59        CCHCR1        GABBR1       
+[163] COX17P1       ZNF580        RP11-212P7.1  LTB4R         RPL13P12      VPS16         TSTD1         RPL35P2       RPL21P119    
+[172] RPL21P16      RPS27AP16     EEF1DP2       RP11-543P15.1 PSME2P6       RP11-864N7.2  RP11-354K1.1  RPL26P6       CTC-546K23.1 
+[181] RPS23P8       RP11-83J16.1  TMEM44-AS1    RPL3P4        AC073283.4    AC144530.1    C19ORF81      RPL24P8       AC091633.2   
+[190] RPL9P9        RPL35P1       ADSL          RPS19P3       RPS21P4       PRAF2         RP11-425L10.1 RP11-466H18.1 RPL18P13     
+[199] TWF2          RP11-366M4.17 ECSCR         RP11-192H23.4 LARP4P        AC005262.4    CTC-444N24.11 RP11-57G10.8 
+
+#################### week14wtvsPBS only genes
+  [1] TRAPPC6A       CYTH3          MPND           POMT2          LRRC23         CCDC88C        EHD2           GRN            PQLC2         
+ [10] PTPRU          MED29          TMEM161A       SLC9A3R2       ASB1           PDE4A          ELOVL1         IFI35          TFE3          
+ [19] GRIPAP1        ATP1B3         ASNS           TCOF1          MBD3           RDH11          STXBP2         TP53INP2       TOLLIP        
+ [28] SSH1           MAST2          BAX            EPB41L1        PEBP1          FXYD5          GRAMD1A        ARHGAP4        HDAC6         
+ [37] TMED1          TIMM13         POLR2E         PES1           HIRA           HMOX1          ARSA           PMM1           GSTZ1         
+ [46] TELO2          NFATC4         PCIF1          GSS            TPD52L2        CTSZ           MAP1LC3A       CDK16          GABRE         
+ [55] CTCF           VAC14          TANGO6         HAGHL          METRN          STUB1          CD276          VPS18          CCDC130       
+ [64] AES            FBL            DYRK1B         LIG1           RASIP1         TNPO2          DNASE2         ERF            BCL7B         
+ [73] CLIP2          NPDC1          UBE2S          RECQL5         DRG2           SYNGR2         RAB5C          DHRS7B         ZBTB16        
+ [82] ATG2A          PRPF19         AMBRA1         P3H3           TRPV4          LTBR           GAPDH          MED23          PPP2R5D       
+ [91] CUL9           ZNF346         ABHD14B        IGFBP2         STK16          SRM            MRPS15         ERI3           PTPA          
+[100] FAM98A         ECHDC2         ZNF205         ACADS          PKN1           WDR83          PFDN5          B9D2           PIGT          
+[109] PEX6           TBCC           BMP4           MSTO1          PPP1R12C       SYMPK          RALY           PRMT1          ABHD8         
+[118] GFER           TUBBP1         ECHS1          STYXL1         MTUS1          PRKCSH         TOMM40         GDF15          PNPLA7        
+[127] UCK1           SLC6A8         ZNF428         PRR7           ARFIP2         ITGB4          FLOT2          DCAF8          HSPBP1        
+[136] MEN1           FLNB           SPRY2          KIAA0368       ST6GALNAC4     GABBR2         IER3           SLC37A4        MAPK8IP3      
+[145] ETV6           CLSTN3         MMAB           GID4           MINK1          TBCD           ERBB2          EVI5L          NOSIP         
+[154] MAP3K6         CREG1          CERS2          RAB13          RIT1           DEGS1          GMPPA          TNIP1          SH3GLB2       
+[163] LRSAM1         CPSF7          ALDOA          BAG3           HHEX           NRGN           FGD5           MARVELD1       RHOC          
+[172] ZFAND3         PHKG2          GALK2          DDX19B         ZNF19          GDPD5          TAGLN2         RALGDS         C19ORF47      
+[181] NACC1          LRWD1          CCNF           TBC1D24        LRP5           VCAM1          PEA15          ATXN7          SHROOM1       
+[190] TMEM55B        RPL27A         KIF7           ENGASE         IRGQ           ZNF668         ZNF146         ABCA3          TTC21A        
+[199] REEP4          TRAPPC11       ATF5           RGS14          NPR1           SIMC1          ZNF212         ZNF692         MOB3A         
+[208] COPRS          POP7           GTPBP2         MUS81          PPP1R3B        B4GAT1         PACS1          SH3BP5L        DRAP1         
+[217] CCDC85B        GPR4           CTC1           SELENOW        RCC2           RAD23A         ZBTB18         SHARPIN        ZNF784        
+[226] OAZ2           ZNF467         BGN            LIMK2          PAQR7          COL18A1        DDX41          COA5           CLDN5         
+[235] TSSC4          BRF1           C19ORF68       POLR3C         KTN1-AS1       BCAM           C15ORF52       TRMT2B         TUBB          
+[244] ZNF471         TPK1           SULF2          PDLIM7         NOP9           DYNC1H1        SPG7           MAK16          TOR4A         
+[253] HMGN5          ANKRD13B       CTR9           ZNF358         R3HDM4         RNA5SP378      RNU1-16P       HSD17B8        HSPA1L        
+[262] PSORS1C1       RPS26P8        AKT1S1         RPS3AP47       MT-TY          HAUS7          ZBTB9          GPSM3          KCTD11        
+[271] HNRNPUL2       GOLGA8B        NPEPL1         HMGB3P22       AB019441.29    RP11-377K22.2  AC002480.5     SLC26A6        AC133965.1    
+[280] LINC00685      RP11-157P1.4   NACAP1         RPS19P7        RP11-364L4.1   RPL4P3         RP3-475N16.1   AC074183.4     RP11-14N7.2   
+[289] AC007969.5     CCDC188        RPL13AP20      ID2-AS1        DDX10P1        FLNB-AS1       RP11-1398P2.1  MIATNB         H2AFJ         
+[298] RGMB-AS1       RP11-215P8.3   CTD-2218G20.1  MALAT1         AP006621.5     LRRC37A13P     RP11-158M2.6   HMBOX1-IT1     RP11-817O13.8 
+[307] ZNF865         CTD-2012K14.6  RP11-166P13.3  RP11-388M20.7  RP11-6N17.4    RP11-385D13.3  MIR24-2        LINC01480      CTD-2583A14.11
+[316] CTD-2035E11.4  ADIRF-AS1      RP11-339B21.10 RP11-22N19.2 
+
+
+######################################## week14dbvsPBS only genes
+  [1] PSMC4          HEXB           LETMD1         UFD1L          RNF126         RPL31          SEL1L3         SPAG7          ZC3HC1        
+ [10] POLDIP3        IFT27          PSME2          IDH3B          TIMP1          ECH1           WDR83OS        ZNF85          BUD31         
+ [19] RPL19          MRPL27         MTCH2          ARPC3          COPZ1          ACOT13         RPS12          OGG1           RBP1          
+ [28] RNF7           TP53I3         RPS15          PRDX1          C1ORF54        IFI27L2        CNRIP1         ACAT2          TMEM39B       
+ [37] CCRL2          UXT            NDUFA5         USHBP1         MED18          DNAJB1         SDF2           SARAF          GNL2          
+ [46] DNAJB2         GYPC           PSMB7          RPL35          MRPL15         PREB           SEC11A         RPS11          PIGK          
+ [55] RPS8           UFC1           RPS27A         RPL32          SURF2          EEF1AKMT1      SREK1IP1       SDHAF4         ATP5J         
+ [64] MCU            C14ORF2        PSMG3          CNOT11         RPL26          MAGOH          DIRAS3         KIAA1143       PGRMC2        
+ [73] NUDT2          RPL36AL        CYB5R2         B2M            ATP5L          ZNF226         LGALS9         ATP5I          ASMTL         
+ [82] CENPX          TM4SF1         GLB1           TMEM126A       GAA            C20ORF196      CHCHD1         RNASEH2C       COQ2          
+ [91] JUP            LRRC75A-AS1    ZBTB8OS        C8ORF59        RPLP2          ZFAND2A        COX14          EIF3K          SSR4          
+[100] D2HGDH         ATP6AP2        NDN            SMDT1          NDUFA6         CCDC190        LAMTOR4        COMMD6         RPS2P46       
+[109] TRAPPC4        RPL12          ZNF480         RACK1          PSENEN         RPL15P3        COX20P1        HNRNPA3P6      ALG3          
+[118] CYTOR          EPB41L4A-AS1   AC105760.2     LTB            PET100         RP4-569M23.2   ATP5O          RP11-234A1.1   RP11-734J24.1 
+[127] RP11-392P7.6   CHCHD10        C8ORF88        RP1-197B17.3   RPL10P15       RP11-138I18.2  RP11-350J20.12
